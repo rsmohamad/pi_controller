@@ -17,11 +17,8 @@ public:
     int totalTime = 0;
 
 private:
-    void generatePlotPoints();
     void readCSV(const std::string &filename);
     void start(NanoCoater *);
-
-    std::vector<std::vector<QPoint>> plotPoints;
     bool isRunning = false;
 };
 

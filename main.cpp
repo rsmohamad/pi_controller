@@ -12,14 +12,15 @@ void handleExit(){
 }
 
 int main (int argc, char *argv[]){
-
+    QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);
+
     QMainWindow window;
     //window.setWindowFlags(Qt::FramelessWindowHint);
 
     RootWidget root;
     if (gpioInitialise() >= 0)
-      root.setNanoCoater(new NanoCoater());
+        root.setNanoCoater(new NanoCoater());
     else{
         QMessageBox msgBox;
         msgBox.setText("Raspberry Pi GPIO not supported");

@@ -35,6 +35,7 @@ std::vector<std::string> split(std::string line, char delim){
 
 Sequence::Sequence(const std::string &filename) {
     readCSV(filename);
+    std::cout << totalTime << std::endl;
 }
 
 void Sequence::readCSV(const std::string &filename){
@@ -85,8 +86,11 @@ void Sequence::applyState(NanoCoater *nanoCoater, int timeStep){
         case HEATER_PUMP:
             nanoCoater->setHeaterPumpSpeed(state[HEATER_PUMP][timeStep]);
             break;
+        case NANO_PUMP:
+            nanoCoater->setStepperFrequency(state[NANO_PUMP][timeStep]);
         default:
-            nanoCoater->setGPIOState(gpioNum[i], state[i][timeStep]);
+            nanoCoater->setGPIOState(i, state[i][timeStep]);
+            break;
         }
     }
 }

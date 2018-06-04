@@ -37,10 +37,14 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
     yAxis->setShadesPen(Qt::NoPen);
     yAxis->setShadesBrush(QBrush(QColor(0x99, 0xcc, 0xcc, 30)));
     yAxis->setShadesVisible(true);
-    setAxisY(yAxis);
 
+    QFont font;
+    font.setFamily("Ubuntu");
+    yAxis->setLabelsFont(font);
+
+    setAxisY(yAxis);
     setAnimationOptions(QChart::SeriesAnimations);
-    setAnimationDuration(200);
+    setAnimationDuration(100);
 }
 
 Chart::~Chart()
@@ -59,13 +63,23 @@ void Chart::reset(){
 void Chart::drawSequence(Sequence *seq){
     series.clear();
     series.resize(seq->state.size());
+    removeAllSeries();
 
     for (unsigned int i = 0; i < seq->state.size(); i++){
         QLineSeries *serie = new QLineSeries(this);
         std::vector<int> points = seq->state[i];
 
         for (qreal j = 0; j < points.size(); j++){
-            qreal y = (11 - i + 0.2) + (0.6 * (double)points[j]);
+            qreal y = (11 - i + 0.2);
+
+            // Normalize non binary values
+            if (i == ATOM_PUMP || i == HEATER_PUMP)
+                y += 0.6 * (double)points[j]/100.0;
+            else if (i == NANO_PUMP)
+                y += 0.6 * (double)points[j]/2000.0;
+            else
+                y += 0.6 * (double)points[j];
+
             serie->append(j, y);
             serie->append(j + 1, y);
         }

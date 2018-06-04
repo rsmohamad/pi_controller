@@ -1,4 +1,4 @@
-QT += quick qml charts
+QT += charts
 CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS

@@ -20,7 +20,7 @@ enum
   NUM_PINS
 };
 
-const int gpioNum[NUM_PINS] = {
+static const unsigned int gpioNum[NUM_PINS] = {
   21, 12, 16, 20, 4, 19, 13, 5, 6, 18, 17, 27, 22, 23
 };
 

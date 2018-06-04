@@ -47,6 +47,9 @@ RootWidget::RootWidget(QWidget *parent) : QWidget(parent)
 
 void RootWidget::handleExit(){
     std::cout << "Exit" << std::endl;
+    if (coater != nullptr)
+        coater->setDefaultState();
+
     QApplication::quit();
 }
 
@@ -54,6 +57,8 @@ void RootWidget::handleStart(){
     std::cout << "Start" << std::endl;
     m_timer.start();
     load->setDisabled(true);
+    start->setDisabled(true);
+    stop->setDisabled(false);
 }
 
 void RootWidget::handleCSV(){
@@ -74,7 +79,6 @@ void RootWidget::handleCSV(){
     chart->drawSequence(seq);
 
     start->setDisabled(false);
-    stop->setDisabled(false);
 }
 
 void RootWidget::handleStop(){
@@ -83,16 +87,22 @@ void RootWidget::handleStop(){
     chart->reset();
     seq->stop(coater);
 
+    if (coater != nullptr)
+        coater->setDefaultState();
+
     load->setDisabled(false);
+    start->setDisabled(false);
+    stop->setDisabled(true);
     timeStep = 0;
 }
 
 void RootWidget::handleTimer(){
-    if (timeStep >= seq->totalTime)
-        handleStop();
-    else{
+    if (timeStep < seq->totalTime){
         chart->step();
         seq->applyState(coater, timeStep);
+    }else{
+        handleStop();
+        return;
     }
     timeStep++;
 }

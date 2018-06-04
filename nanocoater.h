@@ -4,6 +4,8 @@
 #include <pigpio.h>
 #include "pindefs.h"
 
+#include <iostream>
+
 class NanoCoater
 {
 public:
@@ -19,12 +21,14 @@ public:
     gpioSetPWMfrequency(gpioNum[HEATER_PUMP], 200);
     gpioSetPWMfrequency(gpioNum[ATOM_PUMP], 200);
 
+    setDefaultState();
   }
 
-  void setGPIOState(int pin, int state){
+  void setGPIOState(unsigned int pin, int state){
       if (state != 1 || state != 0)
         state = 0;
       gpioWrite(gpioNum[pin], state);
+      //std::cout << gpioNum[pin] << std::endl;
   }
 
   void setAtomPumpSpeed(int speed) { gpioPWM(gpioNum[ATOM_PUMP], speed); }
@@ -40,6 +44,27 @@ public:
     }
     setGPIOState(NANO_PUMP_EN, 0);
     gpioHardwarePWM(gpioNum[NANO_PUMP], 100, freq);
+  }
+
+  void setDefaultState() {
+      for (unsigned int i = 0; i < NANO_PUMP_EN; i++){
+          switch (i) {
+          case HEATER_TEMP:
+              break;
+          case ATOM_PUMP:
+              setAtomPumpSpeed(0);
+              break;
+          case HEATER_PUMP:
+              setHeaterPumpSpeed(0);
+              break;
+          case NANO_PUMP:
+              setStepperFrequency(0);
+              break;
+          default:
+              setGPIOState(i, 0);
+              break;
+          }
+      }
   }
 
 private:
