@@ -1,0 +1,3 @@
+pi_controller
+*.o
+moc_*

@@ -100,7 +100,7 @@ void Sequence::start(NanoCoater *nanoCoater){
         return;
 
     isRunning = true;
-    nanoCoater->setGPIOState(gpioNum[MASTER_SW], 1);
+    nanoCoater->setGPIOState(MASTER_SW, 1);
 }
 
 void Sequence::stop(NanoCoater *nanoCoater){
@@ -108,5 +108,5 @@ void Sequence::stop(NanoCoater *nanoCoater){
         return;
 
     isRunning = false;
-    nanoCoater->setGPIOState(gpioNum[MASTER_SW], 0);
+    nanoCoater->setGPIOState(MASTER_SW, 0);
 }
