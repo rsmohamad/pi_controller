@@ -9,6 +9,23 @@
 #include <QtCharts/QCategoryAxis>
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
+
+#include "pindefs.h"
+
+std::string snakeCaseToNormal(std::string input){
+    std::vector<std::string> tokens = split(input, '_');
+    std::string output;
+
+    for (std::string token : tokens){
+        for (int i = 1; i < token.length(); i++)
+            token[i] = std::tolower(token[i]);
+        output += token + " ";
+    }
+
+    return output;
+}
 
 Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
     QChart(QChart::ChartTypeCartesian, parent, wFlags),
@@ -19,18 +36,21 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
     xAxis->setRange(0, 9);
     setAxisX(xAxis);
 
-    yAxis->append("FILTER_VALVE_CLOSE", 1);
-    yAxis->append("FILTER_VALVE_OPEN", 2);
-    yAxis->append("NANO_PUMP", 3);
-    yAxis->append("ATOM_VALVE_CLOSE", 4);
-    yAxis->append("ATOM_VALVE_OPEN", 5);
-    yAxis->append("ATOM_PUMP", 6);
-    yAxis->append("ATOM_PW", 7);
-    yAxis->append("HEATER_TEMP", 8);
-    yAxis->append("HEATER_VALVE_CLOSE", 9);
-    yAxis->append("HEATER_VALVE_OPEN", 10);
-    yAxis->append("HEATER_PUMP", 11);
-    yAxis->append("HEATER_PW", 12);
+    for (int i = 11; i >= 0; i--)
+        yAxis->append(QString::fromStdString(snakeCaseToNormal(STATE_NAMES[i])), 12-i);
+
+//    yAxis->append("FILTER_VALVE_CLOSE", 1);
+//    yAxis->append("FILTER_VALVE_OPEN", 2);
+//    yAxis->append("NANO_PUMP", 3);
+//    yAxis->append("ATOM_VALVE_CLOSE", 4);
+//    yAxis->append("ATOM_VALVE_OPEN", 5);
+//    yAxis->append("ATOM_PUMP", 6);
+//    yAxis->append("ATOM_PW", 7);
+//    yAxis->append("HEATER_TEMP", 8);
+//    yAxis->append("HEATER_VALVE_CLOSE", 9);
+//    yAxis->append("HEATER_VALVE_OPEN", 10);
+//    yAxis->append("HEATER_PUMP", 11);
+//    yAxis->append("HEATER_PW", 12);
 
     yAxis->setRange(0, 12);
     yAxis->setGridLineVisible(false);

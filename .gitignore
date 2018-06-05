@@ -1,3 +1,4 @@
 pi_controller
 *.o
 moc_*
+*.zip

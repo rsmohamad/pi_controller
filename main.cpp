@@ -7,10 +7,6 @@
 #include "rootwidget.h"
 #include "nanocoater.h"
 
-void handleExit(){
-    std::cout << "Exit" << std::endl;
-}
-
 int main (int argc, char *argv[]){
     QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);

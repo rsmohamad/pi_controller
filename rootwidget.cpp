@@ -5,20 +5,28 @@
 #include <iostream>
 #include <QApplication>
 #include <QFileDialog>
+#include <QStyle>
 
 RootWidget::RootWidget(QWidget *parent) : QWidget(parent)
 
 {
+    //setPaletteBackgroundColor(Qt::white);
+    setAutoFillBackground(true);
+
     chart = new Chart();
-    //chart->setTitle("CSV Sequence");
     chart->legend()->hide();
     chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setRenderHints(QPainter::Antialiasing);
 
     load = new QPushButton("Load CSV");
     start = new QPushButton("Start");
     stop = new QPushButton("Stop");
     exit = new QPushButton("Exit");
+
+    load->setMinimumSize(100, 100);
+    start->setMinimumSize(100, 100);
+    stop->setMinimumSize(100, 100);
+    exit->setMinimumSize(100, 100);
 
     start->setDisabled(true);
     stop->setDisabled(true);
