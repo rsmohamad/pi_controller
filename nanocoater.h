@@ -6,13 +6,11 @@
 
 #include <iostream>
 
-class NanoCoater
-{
-public:
-  NanoCoater()
-  {
+class NanoCoater {
+ public:
+  NanoCoater() {
     for (int i = 0; i < NUM_PINS; i++)
-      gpioSetMode(gpioNum[i], PI_OUTPUT);
+      if (i != HEATER_TEMP) gpioSetMode(gpioNum[i], PI_OUTPUT);
 
     gpioSetMode(gpioNum[HEATER_PUMP], PI_ALT0);
     gpioSetMode(gpioNum[ATOM_PUMP], PI_ALT0);
@@ -24,19 +22,17 @@ public:
     setDefaultState();
   }
 
-  void setGPIOState(unsigned int pin, int state){
-      if (state != 1 || state != 0)
-        state = 0;
-      gpioWrite(gpioNum[pin], state);
-      //std::cout << gpioNum[pin] << std::endl;
+  void setGPIOState(unsigned int pin, int state) {
+    if (state != 1 || state != 0) state = 0;
+    gpioWrite(gpioNum[pin], state);
+    // std::cout << gpioNum[pin] << std::endl;
   }
 
   void setAtomPumpSpeed(int speed) { gpioPWM(gpioNum[ATOM_PUMP], speed); }
 
   void setHeaterPumpSpeed(int speed) { gpioPWM(gpioNum[HEATER_PUMP], speed); }
 
-  void setStepperFrequency(int freq)
-  {
+  void setStepperFrequency(int freq) {
     if (freq <= 0) {
       setGPIOState(NANO_PUMP_EN, 1);
       gpioHardwarePWM(gpioNum[NANO_PUMP], 0, 0);
@@ -47,27 +43,27 @@ public:
   }
 
   void setDefaultState() {
-      for (unsigned int i = 0; i < NANO_PUMP_EN; i++){
-          switch (i) {
-          case HEATER_TEMP:
-              break;
-          case ATOM_PUMP:
-              setAtomPumpSpeed(0);
-              break;
-          case HEATER_PUMP:
-              setHeaterPumpSpeed(0);
-              break;
-          case NANO_PUMP:
-              setStepperFrequency(0);
-              break;
-          default:
-              setGPIOState(i, 0);
-              break;
-          }
+    for (unsigned int i = 0; i < NANO_PUMP_EN; i++) {
+      switch (i) {
+        case HEATER_TEMP:
+          break;
+        case ATOM_PUMP:
+          setAtomPumpSpeed(0);
+          break;
+        case HEATER_PUMP:
+          setHeaterPumpSpeed(0);
+          break;
+        case NANO_PUMP:
+          setStepperFrequency(0);
+          break;
+        default:
+          setGPIOState(i, 0);
+          break;
       }
+    }
   }
 
-private:
+ private:
 };
 
-#endif // GPIO_H
+#endif  // GPIO_H

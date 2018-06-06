@@ -7,7 +7,8 @@ SOURCES += \
     main.cpp \
     chart.cpp \
     rootwidget.cpp \
-    sequence.cpp
+    sequence.cpp \
+    ds18b20.cpp
 
 QML_IMPORT_PATH =
 
@@ -23,6 +24,7 @@ HEADERS += \
     rootwidget.h \
     sequence.h \
     pindefs.h \
-    nanocoater.h
+    nanocoater.h \
+    ds18b20.h
 
 unix:!macx: LIBS += -lpigpio

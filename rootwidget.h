@@ -1,52 +1,58 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QWidget>
 #include <QChartView>
-#include <QtCharts/QChart>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QLabel>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QtCharts/QChart>
 #include <QtCore/QTimer>
 
 #include "chart.h"
-#include "sequence.h"
+#include "ds18b20.h"
 #include "nanocoater.h"
+#include "sequence.h"
 
-class RootWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit RootWidget(QWidget *parent = nullptr);
-    void setNanoCoater(NanoCoater *);
+class RootWidget : public QWidget {
+  Q_OBJECT
+ public:
+  explicit RootWidget(QWidget *parent = nullptr);
+  void setNanoCoater(NanoCoater *);
+  void setTempSensor(DS18B20 *);
 
-signals:
+ signals:
 
-public slots:
-    void handleExit();
-    void handleCSV();
-    void handleStart();
-    void handleStop();
-    void handleTimer();
+ public slots:
+  void handleExit();
+  void handleCSV();
+  void handleStart();
+  void handleStop();
+  void handleTimer();
+  void handleTempRead();
 
-private:
-    QWidget *buttonPane;
-    QChartView *chartView;
+ private:
+  QWidget *buttonPane;
+  QChartView *chartView;
 
-    QHBoxLayout *hbox;
-    QVBoxLayout *vbox;
+  QHBoxLayout *hbox;
+  QVBoxLayout *vbox;
 
-    QPushButton *start;
-    QPushButton *exit;
-    QPushButton *load;
-    QPushButton *stop;
+  QPushButton *start;
+  QPushButton *exit;
+  QPushButton *load;
+  QPushButton *stop;
+  QLabel *tempReading;
 
-    Chart *chart = nullptr;
-    Sequence *seq = nullptr;
-    QTimer m_timer;
+  Chart *chart = nullptr;
+  Sequence *seq = nullptr;
+  QTimer m_timer;
+  QTimer tempTimer;
 
-    int timeStep = 0;
-    NanoCoater *coater = nullptr;
+  int timeStep = 0;
+  NanoCoater *coater = nullptr;
+  DS18B20 *tempSensor = nullptr;
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H
