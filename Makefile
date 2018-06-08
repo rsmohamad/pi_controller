@@ -53,13 +53,15 @@ OBJECTS_DIR   = ./
 SOURCES       = main.cpp \
 		chart.cpp \
 		rootwidget.cpp \
-		sequence.cpp /home/dandi/pi_controller/pi_controller_plugin_import.cpp \
+		sequence.cpp \
+		ds18b20.cpp /home/dandi/pi_controller/pi_controller_plugin_import.cpp \
 		moc_chart.cpp \
 		moc_rootwidget.cpp
 OBJECTS       = main.o \
 		chart.o \
 		rootwidget.o \
 		sequence.o \
+		ds18b20.o \
 		pi_controller_plugin_import.o \
 		moc_chart.o \
 		moc_rootwidget.o
@@ -179,10 +181,12 @@ DIST          = ../raspi/qt5/mkspecs/features/spec_pre.prf \
 		rootwidget.h \
 		sequence.h \
 		pindefs.h \
-		nanocoater.h main.cpp \
+		nanocoater.h \
+		ds18b20.h main.cpp \
 		chart.cpp \
 		rootwidget.cpp \
-		sequence.cpp
+		sequence.cpp \
+		ds18b20.cpp
 QMAKE_TARGET  = pi_controller
 DESTDIR       = 
 TARGET        = pi_controller
@@ -458,8 +462,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../raspi/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents chart.h rootwidget.h sequence.h pindefs.h nanocoater.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp chart.cpp rootwidget.cpp sequence.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents chart.h rootwidget.h sequence.h pindefs.h nanocoater.h ds18b20.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp chart.cpp rootwidget.cpp sequence.cpp ds18b20.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -626,10 +630,13 @@ moc_chart.cpp: ../raspi/qt5pi/include/QtCharts/QChart \
 		../raspi/qt5/bin/moc
 	/home/dandi/raspi/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/home/dandi/raspi/qt5/mkspecs/devices/linux-rasp-pi3-g++ -I/home/dandi/pi_controller -I/home/dandi/raspi/qt5pi/include -I/home/dandi/raspi/qt5pi/include/QtCharts -I/home/dandi/raspi/qt5pi/include/QtWidgets -I/home/dandi/raspi/qt5pi/include/QtGui -I/home/dandi/raspi/qt5pi/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include chart.h -o moc_chart.cpp
 
-moc_rootwidget.cpp: ../raspi/qt5pi/include/QtWidgets/QWidget \
-		../raspi/qt5pi/include/QtWidgets/qwidget.h \
-		../raspi/qt5pi/include/QtWidgets/qtwidgetsglobal.h \
-		../raspi/qt5pi/include/QtGui/qtguiglobal.h \
+moc_rootwidget.cpp: ../raspi/qt5pi/include/QtCharts/QChartView \
+		../raspi/qt5pi/include/QtCharts/qchartview.h \
+		../raspi/qt5pi/include/QtCharts/QAbstractAxis \
+		../raspi/qt5pi/include/QtCharts/qabstractaxis.h \
+		../raspi/qt5pi/include/QtCharts/QChartGlobal \
+		../raspi/qt5pi/include/QtCharts/qchartglobal.h \
+		../raspi/qt5pi/include/QtCore/QtGlobal \
 		../raspi/qt5pi/include/QtCore/qglobal.h \
 		../raspi/qt5pi/include/QtCore/qconfig-bootstrapped.h \
 		../raspi/qt5pi/include/QtCore/qconfig.h \
@@ -651,71 +658,68 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCore/qmutex.h \
 		../raspi/qt5pi/include/QtCore/qnumeric.h \
 		../raspi/qt5pi/include/QtCore/qversiontagging.h \
+		../raspi/qt5pi/include/QtGui/QPen \
+		../raspi/qt5pi/include/QtGui/qpen.h \
+		../raspi/qt5pi/include/QtGui/qtguiglobal.h \
 		../raspi/qt5pi/include/QtGui/qtgui-config.h \
-		../raspi/qt5pi/include/QtWidgets/qtwidgets-config.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtGui/qcolor.h \
+		../raspi/qt5pi/include/QtGui/qrgb.h \
 		../raspi/qt5pi/include/QtCore/qnamespace.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
-		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qstringlist.h \
+		../raspi/qt5pi/include/QtCore/qlist.h \
+		../raspi/qt5pi/include/QtCore/qalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qiterator.h \
+		../raspi/qt5pi/include/QtCore/qrefcount.h \
+		../raspi/qt5pi/include/QtCore/qarraydata.h \
+		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
 		../raspi/qt5pi/include/QtCore/qstring.h \
 		../raspi/qt5pi/include/QtCore/qchar.h \
 		../raspi/qt5pi/include/QtCore/qbytearray.h \
-		../raspi/qt5pi/include/QtCore/qrefcount.h \
-		../raspi/qt5pi/include/QtCore/qarraydata.h \
 		../raspi/qt5pi/include/QtCore/qstringliteral.h \
 		../raspi/qt5pi/include/QtCore/qstringalgorithms.h \
 		../raspi/qt5pi/include/QtCore/qstringview.h \
 		../raspi/qt5pi/include/QtCore/qstringbuilder.h \
-		../raspi/qt5pi/include/QtCore/qlist.h \
-		../raspi/qt5pi/include/QtCore/qalgorithms.h \
-		../raspi/qt5pi/include/QtCore/qiterator.h \
-		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
 		../raspi/qt5pi/include/QtCore/qpair.h \
 		../raspi/qt5pi/include/QtCore/qbytearraylist.h \
-		../raspi/qt5pi/include/QtCore/qstringlist.h \
 		../raspi/qt5pi/include/QtCore/qregexp.h \
 		../raspi/qt5pi/include/QtCore/qstringmatcher.h \
-		../raspi/qt5pi/include/QtCore/qcoreevent.h \
+		../raspi/qt5pi/include/QtGui/qrgba64.h \
+		../raspi/qt5pi/include/QtGui/qbrush.h \
+		../raspi/qt5pi/include/QtCore/qpoint.h \
+		../raspi/qt5pi/include/QtCore/qvector.h \
 		../raspi/qt5pi/include/QtCore/qscopedpointer.h \
+		../raspi/qt5pi/include/QtGui/qmatrix.h \
+		../raspi/qt5pi/include/QtGui/qpolygon.h \
+		../raspi/qt5pi/include/QtCore/qrect.h \
+		../raspi/qt5pi/include/QtCore/qmargins.h \
+		../raspi/qt5pi/include/QtCore/qsize.h \
+		../raspi/qt5pi/include/QtGui/qregion.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
+		../raspi/qt5pi/include/QtCore/qdatastream.h \
+		../raspi/qt5pi/include/QtCore/qiodevice.h \
+		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qcoreevent.h \
 		../raspi/qt5pi/include/QtCore/qmetatype.h \
 		../raspi/qt5pi/include/QtCore/qvarlengtharray.h \
 		../raspi/qt5pi/include/QtCore/qcontainerfwd.h \
 		../raspi/qt5pi/include/QtCore/qobject_impl.h \
-		../raspi/qt5pi/include/QtCore/qmargins.h \
-		../raspi/qt5pi/include/QtGui/qpaintdevice.h \
-		../raspi/qt5pi/include/QtCore/qrect.h \
-		../raspi/qt5pi/include/QtCore/qsize.h \
-		../raspi/qt5pi/include/QtCore/qpoint.h \
-		../raspi/qt5pi/include/QtGui/qpalette.h \
-		../raspi/qt5pi/include/QtGui/qcolor.h \
-		../raspi/qt5pi/include/QtGui/qrgb.h \
-		../raspi/qt5pi/include/QtGui/qrgba64.h \
-		../raspi/qt5pi/include/QtGui/qbrush.h \
-		../raspi/qt5pi/include/QtCore/qvector.h \
-		../raspi/qt5pi/include/QtGui/qmatrix.h \
-		../raspi/qt5pi/include/QtGui/qpolygon.h \
-		../raspi/qt5pi/include/QtGui/qregion.h \
-		../raspi/qt5pi/include/QtCore/qdatastream.h \
-		../raspi/qt5pi/include/QtCore/qiodevice.h \
 		../raspi/qt5pi/include/QtCore/qline.h \
 		../raspi/qt5pi/include/QtGui/qtransform.h \
 		../raspi/qt5pi/include/QtGui/qpainterpath.h \
 		../raspi/qt5pi/include/QtGui/qimage.h \
+		../raspi/qt5pi/include/QtGui/qpaintdevice.h \
 		../raspi/qt5pi/include/QtGui/qpixelformat.h \
 		../raspi/qt5pi/include/QtGui/qpixmap.h \
 		../raspi/qt5pi/include/QtCore/qsharedpointer.h \
 		../raspi/qt5pi/include/QtCore/qshareddata.h \
 		../raspi/qt5pi/include/QtCore/qhash.h \
 		../raspi/qt5pi/include/QtCore/qsharedpointer_impl.h \
+		../raspi/qt5pi/include/QtGui/QFont \
 		../raspi/qt5pi/include/QtGui/qfont.h \
-		../raspi/qt5pi/include/QtGui/qfontmetrics.h \
-		../raspi/qt5pi/include/QtGui/qfontinfo.h \
-		../raspi/qt5pi/include/QtWidgets/qsizepolicy.h \
-		../raspi/qt5pi/include/QtGui/qcursor.h \
-		../raspi/qt5pi/include/QtGui/qkeysequence.h \
-		../raspi/qt5pi/include/QtGui/qevent.h \
+		../raspi/qt5pi/include/QtCore/QVariant \
 		../raspi/qt5pi/include/QtCore/qvariant.h \
 		../raspi/qt5pi/include/QtCore/qmap.h \
 		../raspi/qt5pi/include/QtCore/qdebug.h \
@@ -723,23 +727,6 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCore/qlocale.h \
 		../raspi/qt5pi/include/QtCore/qset.h \
 		../raspi/qt5pi/include/QtCore/qcontiguouscache.h \
-		../raspi/qt5pi/include/QtCore/qurl.h \
-		../raspi/qt5pi/include/QtCore/qurlquery.h \
-		../raspi/qt5pi/include/QtCore/qfile.h \
-		../raspi/qt5pi/include/QtCore/qfiledevice.h \
-		../raspi/qt5pi/include/QtGui/qvector2d.h \
-		../raspi/qt5pi/include/QtGui/qtouchdevice.h \
-		../raspi/qt5pi/include/QtCharts/QChartView \
-		../raspi/qt5pi/include/QtCharts/qchartview.h \
-		../raspi/qt5pi/include/QtCharts/QAbstractAxis \
-		../raspi/qt5pi/include/QtCharts/qabstractaxis.h \
-		../raspi/qt5pi/include/QtCharts/QChartGlobal \
-		../raspi/qt5pi/include/QtCharts/qchartglobal.h \
-		../raspi/qt5pi/include/QtCore/QtGlobal \
-		../raspi/qt5pi/include/QtGui/QPen \
-		../raspi/qt5pi/include/QtGui/qpen.h \
-		../raspi/qt5pi/include/QtGui/QFont \
-		../raspi/qt5pi/include/QtCore/QVariant \
 		../raspi/qt5pi/include/QtCharts/QAbstractSeries \
 		../raspi/qt5pi/include/QtCharts/qabstractseries.h \
 		../raspi/qt5pi/include/QtCore/QObject \
@@ -749,28 +736,47 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCharts/qlegend.h \
 		../raspi/qt5pi/include/QtWidgets/QGraphicsWidget \
 		../raspi/qt5pi/include/QtWidgets/qgraphicswidget.h \
+		../raspi/qt5pi/include/QtWidgets/qtwidgetsglobal.h \
+		../raspi/qt5pi/include/QtWidgets/qtwidgets-config.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicslayoutitem.h \
+		../raspi/qt5pi/include/QtWidgets/qsizepolicy.h \
+		../raspi/qt5pi/include/QtGui/qevent.h \
+		../raspi/qt5pi/include/QtGui/qkeysequence.h \
+		../raspi/qt5pi/include/QtCore/qurl.h \
+		../raspi/qt5pi/include/QtCore/qurlquery.h \
+		../raspi/qt5pi/include/QtCore/qfile.h \
+		../raspi/qt5pi/include/QtCore/qfiledevice.h \
+		../raspi/qt5pi/include/QtGui/qvector2d.h \
+		../raspi/qt5pi/include/QtGui/qtouchdevice.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsitem.h \
+		../raspi/qt5pi/include/QtGui/qpalette.h \
 		../raspi/qt5pi/include/QtGui/QBrush \
 		../raspi/qt5pi/include/QtCore/QMargins \
 		../raspi/qt5pi/include/QtWidgets/QGraphicsView \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsview.h \
 		../raspi/qt5pi/include/QtGui/qpainter.h \
 		../raspi/qt5pi/include/QtGui/qtextoption.h \
+		../raspi/qt5pi/include/QtGui/qfontinfo.h \
+		../raspi/qt5pi/include/QtGui/qfontmetrics.h \
 		../raspi/qt5pi/include/QtWidgets/qscrollarea.h \
 		../raspi/qt5pi/include/QtWidgets/qabstractscrollarea.h \
 		../raspi/qt5pi/include/QtWidgets/qframe.h \
+		../raspi/qt5pi/include/QtWidgets/qwidget.h \
+		../raspi/qt5pi/include/QtGui/qcursor.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsscene.h \
 		../raspi/qt5pi/include/QtWidgets/QHBoxLayout \
 		../raspi/qt5pi/include/QtWidgets/qboxlayout.h \
 		../raspi/qt5pi/include/QtWidgets/qlayout.h \
 		../raspi/qt5pi/include/QtWidgets/qlayoutitem.h \
 		../raspi/qt5pi/include/QtWidgets/qgridlayout.h \
-		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QLabel \
+		../raspi/qt5pi/include/QtWidgets/qlabel.h \
 		../raspi/qt5pi/include/QtWidgets/QPushButton \
 		../raspi/qt5pi/include/QtWidgets/qpushbutton.h \
 		../raspi/qt5pi/include/QtWidgets/qabstractbutton.h \
 		../raspi/qt5pi/include/QtGui/qicon.h \
+		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCore/QTimer \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
@@ -779,6 +785,7 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtWidgets/QWidget \
 		pindefs.h \
 		nanocoater.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
+		ds18b20.h \
 		rootwidget.h \
 		moc_predefs.h \
 		../raspi/qt5/bin/moc
@@ -800,8 +807,8 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
-		../raspi/qt5pi/include/QtWidgets/qapplication.h \
+main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QMessageBox \
+		../raspi/qt5pi/include/QtWidgets/qmessagebox.h \
 		../raspi/qt5pi/include/QtWidgets/qtwidgetsglobal.h \
 		../raspi/qt5pi/include/QtGui/qtguiglobal.h \
 		../raspi/qt5pi/include/QtCore/qglobal.h \
@@ -827,20 +834,23 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtCore/qversiontagging.h \
 		../raspi/qt5pi/include/QtGui/qtgui-config.h \
 		../raspi/qt5pi/include/QtWidgets/qtwidgets-config.h \
-		../raspi/qt5pi/include/QtCore/qcoreapplication.h \
+		../raspi/qt5pi/include/QtWidgets/qdialog.h \
+		../raspi/qt5pi/include/QtWidgets/qwidget.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtCore/qnamespace.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
+		../raspi/qt5pi/include/QtCore/qobject.h \
 		../raspi/qt5pi/include/QtCore/qstring.h \
 		../raspi/qt5pi/include/QtCore/qchar.h \
 		../raspi/qt5pi/include/QtCore/qbytearray.h \
 		../raspi/qt5pi/include/QtCore/qrefcount.h \
-		../raspi/qt5pi/include/QtCore/qnamespace.h \
 		../raspi/qt5pi/include/QtCore/qarraydata.h \
 		../raspi/qt5pi/include/QtCore/qstringliteral.h \
 		../raspi/qt5pi/include/QtCore/qstringalgorithms.h \
 		../raspi/qt5pi/include/QtCore/qstringview.h \
 		../raspi/qt5pi/include/QtCore/qstringbuilder.h \
-		../raspi/qt5pi/include/QtCore/qobject.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
 		../raspi/qt5pi/include/QtCore/qlist.h \
 		../raspi/qt5pi/include/QtCore/qalgorithms.h \
 		../raspi/qt5pi/include/QtCore/qiterator.h \
@@ -856,17 +866,11 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtCore/qvarlengtharray.h \
 		../raspi/qt5pi/include/QtCore/qcontainerfwd.h \
 		../raspi/qt5pi/include/QtCore/qobject_impl.h \
-		../raspi/qt5pi/include/QtCore/qeventloop.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
-		../raspi/qt5pi/include/QtCore/qpoint.h \
-		../raspi/qt5pi/include/QtCore/qsize.h \
-		../raspi/qt5pi/include/QtGui/qcursor.h \
-		../raspi/qt5pi/include/QtWidgets/qdesktopwidget.h \
-		../raspi/qt5pi/include/QtWidgets/qwidget.h \
 		../raspi/qt5pi/include/QtCore/qmargins.h \
 		../raspi/qt5pi/include/QtGui/qpaintdevice.h \
 		../raspi/qt5pi/include/QtCore/qrect.h \
+		../raspi/qt5pi/include/QtCore/qsize.h \
+		../raspi/qt5pi/include/QtCore/qpoint.h \
 		../raspi/qt5pi/include/QtGui/qpalette.h \
 		../raspi/qt5pi/include/QtGui/qcolor.h \
 		../raspi/qt5pi/include/QtGui/qrgb.h \
@@ -892,6 +896,7 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtGui/qfontmetrics.h \
 		../raspi/qt5pi/include/QtGui/qfontinfo.h \
 		../raspi/qt5pi/include/QtWidgets/qsizepolicy.h \
+		../raspi/qt5pi/include/QtGui/qcursor.h \
 		../raspi/qt5pi/include/QtGui/qkeysequence.h \
 		../raspi/qt5pi/include/QtGui/qevent.h \
 		../raspi/qt5pi/include/QtCore/qvariant.h \
@@ -907,17 +912,20 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtCore/qfiledevice.h \
 		../raspi/qt5pi/include/QtGui/qvector2d.h \
 		../raspi/qt5pi/include/QtGui/qtouchdevice.h \
+		../raspi/qt5pi/include/QtWidgets/QApplication \
+		../raspi/qt5pi/include/QtWidgets/qapplication.h \
+		../raspi/qt5pi/include/QtCore/qcoreapplication.h \
+		../raspi/qt5pi/include/QtCore/qeventloop.h \
+		../raspi/qt5pi/include/QtWidgets/qdesktopwidget.h \
 		../raspi/qt5pi/include/QtGui/qguiapplication.h \
 		../raspi/qt5pi/include/QtGui/qinputmethod.h \
 		../raspi/qt5pi/include/QtWidgets/QMainWindow \
 		../raspi/qt5pi/include/QtWidgets/qmainwindow.h \
 		../raspi/qt5pi/include/QtWidgets/qtabwidget.h \
 		../raspi/qt5pi/include/QtGui/qicon.h \
-		../raspi/qt5pi/include/QtWidgets/QMessageBox \
-		../raspi/qt5pi/include/QtWidgets/qmessagebox.h \
-		../raspi/qt5pi/include/QtWidgets/qdialog.h \
+		nanocoater.h \
+		pindefs.h \
 		rootwidget.h \
-		../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCharts/QChartView \
 		../raspi/qt5pi/include/QtCharts/qchartview.h \
 		../raspi/qt5pi/include/QtCharts/QAbstractAxis \
@@ -955,18 +963,20 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtWidgets/qlayout.h \
 		../raspi/qt5pi/include/QtWidgets/qlayoutitem.h \
 		../raspi/qt5pi/include/QtWidgets/qgridlayout.h \
-		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QLabel \
+		../raspi/qt5pi/include/QtWidgets/qlabel.h \
 		../raspi/qt5pi/include/QtWidgets/QPushButton \
 		../raspi/qt5pi/include/QtWidgets/qpushbutton.h \
 		../raspi/qt5pi/include/QtWidgets/qabstractbutton.h \
+		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCore/QTimer \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
 		chart.h \
 		sequence.h \
-		pindefs.h \
-		nanocoater.h \
-		../raspi/qt5pi/include/QtCore/QPoint
+		../raspi/qt5pi/include/QtCore/QPoint \
+		ds18b20.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 chart.o: chart.cpp chart.h \
@@ -1097,26 +1107,29 @@ chart.o: chart.cpp chart.h \
 		pindefs.h \
 		nanocoater.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
+		../raspi/qt5pi/include/QtCore/QEasingCurve \
+		../raspi/qt5pi/include/QtCore/qeasingcurve.h \
+		../raspi/qt5pi/include/QtCharts/QCategoryAxis \
+		../raspi/qt5pi/include/QtCharts/qcategoryaxis.h \
+		../raspi/qt5pi/include/QtCharts/QValueAxis \
+		../raspi/qt5pi/include/QtCharts/qvalueaxis.h \
 		../raspi/qt5pi/include/QtCharts/QLineSeries \
 		../raspi/qt5pi/include/QtCharts/qlineseries.h \
 		../raspi/qt5pi/include/QtCharts/QXYSeries \
 		../raspi/qt5pi/include/QtCharts/qxyseries.h \
-		../raspi/qt5pi/include/QtCharts/QValueAxis \
-		../raspi/qt5pi/include/QtCharts/qvalueaxis.h \
-		../raspi/qt5pi/include/QtCore/QEasingCurve \
-		../raspi/qt5pi/include/QtCore/qeasingcurve.h \
-		../raspi/qt5pi/include/QtCore/QRandomGenerator \
-		../raspi/qt5pi/include/QtCore/qrandom.h \
 		../raspi/qt5pi/include/QtCore/QDebug \
-		../raspi/qt5pi/include/QtCharts/QCategoryAxis \
-		../raspi/qt5pi/include/QtCharts/qcategoryaxis.h
+		../raspi/qt5pi/include/QtCore/QRandomGenerator \
+		../raspi/qt5pi/include/QtCore/qrandom.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chart.o chart.cpp
 
 rootwidget.o: rootwidget.cpp rootwidget.h \
-		../raspi/qt5pi/include/QtWidgets/QWidget \
-		../raspi/qt5pi/include/QtWidgets/qwidget.h \
-		../raspi/qt5pi/include/QtWidgets/qtwidgetsglobal.h \
-		../raspi/qt5pi/include/QtGui/qtguiglobal.h \
+		../raspi/qt5pi/include/QtCharts/QChartView \
+		../raspi/qt5pi/include/QtCharts/qchartview.h \
+		../raspi/qt5pi/include/QtCharts/QAbstractAxis \
+		../raspi/qt5pi/include/QtCharts/qabstractaxis.h \
+		../raspi/qt5pi/include/QtCharts/QChartGlobal \
+		../raspi/qt5pi/include/QtCharts/qchartglobal.h \
+		../raspi/qt5pi/include/QtCore/QtGlobal \
 		../raspi/qt5pi/include/QtCore/qglobal.h \
 		../raspi/qt5pi/include/QtCore/qconfig-bootstrapped.h \
 		../raspi/qt5pi/include/QtCore/qconfig.h \
@@ -1138,71 +1151,68 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		../raspi/qt5pi/include/QtCore/qmutex.h \
 		../raspi/qt5pi/include/QtCore/qnumeric.h \
 		../raspi/qt5pi/include/QtCore/qversiontagging.h \
+		../raspi/qt5pi/include/QtGui/QPen \
+		../raspi/qt5pi/include/QtGui/qpen.h \
+		../raspi/qt5pi/include/QtGui/qtguiglobal.h \
 		../raspi/qt5pi/include/QtGui/qtgui-config.h \
-		../raspi/qt5pi/include/QtWidgets/qtwidgets-config.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtGui/qcolor.h \
+		../raspi/qt5pi/include/QtGui/qrgb.h \
 		../raspi/qt5pi/include/QtCore/qnamespace.h \
-		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
-		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
-		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qstringlist.h \
+		../raspi/qt5pi/include/QtCore/qlist.h \
+		../raspi/qt5pi/include/QtCore/qalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qiterator.h \
+		../raspi/qt5pi/include/QtCore/qrefcount.h \
+		../raspi/qt5pi/include/QtCore/qarraydata.h \
+		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
 		../raspi/qt5pi/include/QtCore/qstring.h \
 		../raspi/qt5pi/include/QtCore/qchar.h \
 		../raspi/qt5pi/include/QtCore/qbytearray.h \
-		../raspi/qt5pi/include/QtCore/qrefcount.h \
-		../raspi/qt5pi/include/QtCore/qarraydata.h \
 		../raspi/qt5pi/include/QtCore/qstringliteral.h \
 		../raspi/qt5pi/include/QtCore/qstringalgorithms.h \
 		../raspi/qt5pi/include/QtCore/qstringview.h \
 		../raspi/qt5pi/include/QtCore/qstringbuilder.h \
-		../raspi/qt5pi/include/QtCore/qlist.h \
-		../raspi/qt5pi/include/QtCore/qalgorithms.h \
-		../raspi/qt5pi/include/QtCore/qiterator.h \
-		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
 		../raspi/qt5pi/include/QtCore/qpair.h \
 		../raspi/qt5pi/include/QtCore/qbytearraylist.h \
-		../raspi/qt5pi/include/QtCore/qstringlist.h \
 		../raspi/qt5pi/include/QtCore/qregexp.h \
 		../raspi/qt5pi/include/QtCore/qstringmatcher.h \
-		../raspi/qt5pi/include/QtCore/qcoreevent.h \
+		../raspi/qt5pi/include/QtGui/qrgba64.h \
+		../raspi/qt5pi/include/QtGui/qbrush.h \
+		../raspi/qt5pi/include/QtCore/qpoint.h \
+		../raspi/qt5pi/include/QtCore/qvector.h \
 		../raspi/qt5pi/include/QtCore/qscopedpointer.h \
+		../raspi/qt5pi/include/QtGui/qmatrix.h \
+		../raspi/qt5pi/include/QtGui/qpolygon.h \
+		../raspi/qt5pi/include/QtCore/qrect.h \
+		../raspi/qt5pi/include/QtCore/qmargins.h \
+		../raspi/qt5pi/include/QtCore/qsize.h \
+		../raspi/qt5pi/include/QtGui/qregion.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
+		../raspi/qt5pi/include/QtGui/qwindowdefs_win.h \
+		../raspi/qt5pi/include/QtCore/qdatastream.h \
+		../raspi/qt5pi/include/QtCore/qiodevice.h \
+		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qcoreevent.h \
 		../raspi/qt5pi/include/QtCore/qmetatype.h \
 		../raspi/qt5pi/include/QtCore/qvarlengtharray.h \
 		../raspi/qt5pi/include/QtCore/qcontainerfwd.h \
 		../raspi/qt5pi/include/QtCore/qobject_impl.h \
-		../raspi/qt5pi/include/QtCore/qmargins.h \
-		../raspi/qt5pi/include/QtGui/qpaintdevice.h \
-		../raspi/qt5pi/include/QtCore/qrect.h \
-		../raspi/qt5pi/include/QtCore/qsize.h \
-		../raspi/qt5pi/include/QtCore/qpoint.h \
-		../raspi/qt5pi/include/QtGui/qpalette.h \
-		../raspi/qt5pi/include/QtGui/qcolor.h \
-		../raspi/qt5pi/include/QtGui/qrgb.h \
-		../raspi/qt5pi/include/QtGui/qrgba64.h \
-		../raspi/qt5pi/include/QtGui/qbrush.h \
-		../raspi/qt5pi/include/QtCore/qvector.h \
-		../raspi/qt5pi/include/QtGui/qmatrix.h \
-		../raspi/qt5pi/include/QtGui/qpolygon.h \
-		../raspi/qt5pi/include/QtGui/qregion.h \
-		../raspi/qt5pi/include/QtCore/qdatastream.h \
-		../raspi/qt5pi/include/QtCore/qiodevice.h \
 		../raspi/qt5pi/include/QtCore/qline.h \
 		../raspi/qt5pi/include/QtGui/qtransform.h \
 		../raspi/qt5pi/include/QtGui/qpainterpath.h \
 		../raspi/qt5pi/include/QtGui/qimage.h \
+		../raspi/qt5pi/include/QtGui/qpaintdevice.h \
 		../raspi/qt5pi/include/QtGui/qpixelformat.h \
 		../raspi/qt5pi/include/QtGui/qpixmap.h \
 		../raspi/qt5pi/include/QtCore/qsharedpointer.h \
 		../raspi/qt5pi/include/QtCore/qshareddata.h \
 		../raspi/qt5pi/include/QtCore/qhash.h \
 		../raspi/qt5pi/include/QtCore/qsharedpointer_impl.h \
+		../raspi/qt5pi/include/QtGui/QFont \
 		../raspi/qt5pi/include/QtGui/qfont.h \
-		../raspi/qt5pi/include/QtGui/qfontmetrics.h \
-		../raspi/qt5pi/include/QtGui/qfontinfo.h \
-		../raspi/qt5pi/include/QtWidgets/qsizepolicy.h \
-		../raspi/qt5pi/include/QtGui/qcursor.h \
-		../raspi/qt5pi/include/QtGui/qkeysequence.h \
-		../raspi/qt5pi/include/QtGui/qevent.h \
+		../raspi/qt5pi/include/QtCore/QVariant \
 		../raspi/qt5pi/include/QtCore/qvariant.h \
 		../raspi/qt5pi/include/QtCore/qmap.h \
 		../raspi/qt5pi/include/QtCore/qdebug.h \
@@ -1210,23 +1220,6 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		../raspi/qt5pi/include/QtCore/qlocale.h \
 		../raspi/qt5pi/include/QtCore/qset.h \
 		../raspi/qt5pi/include/QtCore/qcontiguouscache.h \
-		../raspi/qt5pi/include/QtCore/qurl.h \
-		../raspi/qt5pi/include/QtCore/qurlquery.h \
-		../raspi/qt5pi/include/QtCore/qfile.h \
-		../raspi/qt5pi/include/QtCore/qfiledevice.h \
-		../raspi/qt5pi/include/QtGui/qvector2d.h \
-		../raspi/qt5pi/include/QtGui/qtouchdevice.h \
-		../raspi/qt5pi/include/QtCharts/QChartView \
-		../raspi/qt5pi/include/QtCharts/qchartview.h \
-		../raspi/qt5pi/include/QtCharts/QAbstractAxis \
-		../raspi/qt5pi/include/QtCharts/qabstractaxis.h \
-		../raspi/qt5pi/include/QtCharts/QChartGlobal \
-		../raspi/qt5pi/include/QtCharts/qchartglobal.h \
-		../raspi/qt5pi/include/QtCore/QtGlobal \
-		../raspi/qt5pi/include/QtGui/QPen \
-		../raspi/qt5pi/include/QtGui/qpen.h \
-		../raspi/qt5pi/include/QtGui/QFont \
-		../raspi/qt5pi/include/QtCore/QVariant \
 		../raspi/qt5pi/include/QtCharts/QAbstractSeries \
 		../raspi/qt5pi/include/QtCharts/qabstractseries.h \
 		../raspi/qt5pi/include/QtCore/QObject \
@@ -1236,28 +1229,47 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		../raspi/qt5pi/include/QtCharts/qlegend.h \
 		../raspi/qt5pi/include/QtWidgets/QGraphicsWidget \
 		../raspi/qt5pi/include/QtWidgets/qgraphicswidget.h \
+		../raspi/qt5pi/include/QtWidgets/qtwidgetsglobal.h \
+		../raspi/qt5pi/include/QtWidgets/qtwidgets-config.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicslayoutitem.h \
+		../raspi/qt5pi/include/QtWidgets/qsizepolicy.h \
+		../raspi/qt5pi/include/QtGui/qevent.h \
+		../raspi/qt5pi/include/QtGui/qkeysequence.h \
+		../raspi/qt5pi/include/QtCore/qurl.h \
+		../raspi/qt5pi/include/QtCore/qurlquery.h \
+		../raspi/qt5pi/include/QtCore/qfile.h \
+		../raspi/qt5pi/include/QtCore/qfiledevice.h \
+		../raspi/qt5pi/include/QtGui/qvector2d.h \
+		../raspi/qt5pi/include/QtGui/qtouchdevice.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsitem.h \
+		../raspi/qt5pi/include/QtGui/qpalette.h \
 		../raspi/qt5pi/include/QtGui/QBrush \
 		../raspi/qt5pi/include/QtCore/QMargins \
 		../raspi/qt5pi/include/QtWidgets/QGraphicsView \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsview.h \
 		../raspi/qt5pi/include/QtGui/qpainter.h \
 		../raspi/qt5pi/include/QtGui/qtextoption.h \
+		../raspi/qt5pi/include/QtGui/qfontinfo.h \
+		../raspi/qt5pi/include/QtGui/qfontmetrics.h \
 		../raspi/qt5pi/include/QtWidgets/qscrollarea.h \
 		../raspi/qt5pi/include/QtWidgets/qabstractscrollarea.h \
 		../raspi/qt5pi/include/QtWidgets/qframe.h \
+		../raspi/qt5pi/include/QtWidgets/qwidget.h \
+		../raspi/qt5pi/include/QtGui/qcursor.h \
 		../raspi/qt5pi/include/QtWidgets/qgraphicsscene.h \
 		../raspi/qt5pi/include/QtWidgets/QHBoxLayout \
 		../raspi/qt5pi/include/QtWidgets/qboxlayout.h \
 		../raspi/qt5pi/include/QtWidgets/qlayout.h \
 		../raspi/qt5pi/include/QtWidgets/qlayoutitem.h \
 		../raspi/qt5pi/include/QtWidgets/qgridlayout.h \
-		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QLabel \
+		../raspi/qt5pi/include/QtWidgets/qlabel.h \
 		../raspi/qt5pi/include/QtWidgets/QPushButton \
 		../raspi/qt5pi/include/QtWidgets/qpushbutton.h \
 		../raspi/qt5pi/include/QtWidgets/qabstractbutton.h \
 		../raspi/qt5pi/include/QtGui/qicon.h \
+		../raspi/qt5pi/include/QtWidgets/QVBoxLayout \
+		../raspi/qt5pi/include/QtWidgets/QWidget \
 		../raspi/qt5pi/include/QtCore/QTimer \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
@@ -1266,6 +1278,7 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		pindefs.h \
 		nanocoater.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
+		ds18b20.h \
 		../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtWidgets/qapplication.h \
 		../raspi/qt5pi/include/QtCore/qcoreapplication.h \
@@ -1277,7 +1290,9 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		../raspi/qt5pi/include/QtWidgets/qfiledialog.h \
 		../raspi/qt5pi/include/QtCore/qdir.h \
 		../raspi/qt5pi/include/QtCore/qfileinfo.h \
-		../raspi/qt5pi/include/QtWidgets/qdialog.h
+		../raspi/qt5pi/include/QtWidgets/qdialog.h \
+		../raspi/qt5pi/include/QtWidgets/QStyle \
+		../raspi/qt5pi/include/QtWidgets/qstyle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rootwidget.o rootwidget.cpp
 
 sequence.o: sequence.cpp sequence.h \
@@ -1308,6 +1323,9 @@ sequence.o: sequence.cpp sequence.h \
 		../raspi/qt5pi/include/QtCore/qnumeric.h \
 		../raspi/qt5pi/include/QtCore/qversiontagging.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sequence.o sequence.cpp
+
+ds18b20.o: ds18b20.cpp ds18b20.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ds18b20.o ds18b20.cpp
 
 pi_controller_plugin_import.o: /home/dandi/pi_controller/pi_controller_plugin_import.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pi_controller_plugin_import.o /home/dandi/pi_controller/pi_controller_plugin_import.cpp

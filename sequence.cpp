@@ -29,7 +29,7 @@ void Sequence::readCSV(const std::string &filename) {
       seq.push_back(val);
     }
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < MASTER_SW; i++)
       if (name == STATE_NAMES[i]) {
         state[i] = seq;
         break;
@@ -44,7 +44,7 @@ void Sequence::applyState(NanoCoater *nanoCoater, int timeStep) {
 
   if (!isRunning) start(nanoCoater);
 
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < MASTER_SW; i++) {
     switch (i) {
       case HEATER_TEMP:
         break;
@@ -60,6 +60,40 @@ void Sequence::applyState(NanoCoater *nanoCoater, int timeStep) {
         nanoCoater->setGPIOState(i, state[i][timeStep]);
         break;
     }
+  }
+}
+
+// Apply temperature control according to what client wants
+void Sequence::applyState(NanoCoater *nanoCoater, int timeStep,
+                          double temperature) {
+  if (nanoCoater == nullptr) return;
+  applyState(nanoCoater, timeStep);
+
+  double targetTemperature = state[HEATER_TEMP][timeStep];
+
+  // Do nothing if target temperature outside range
+  if (targetTemperature < 40 || targetTemperature > 100) {
+    nanoCoater->setGPIOState(HEATER_PW, 0);
+    heaterOn = false;
+    return;
+  }
+
+  // Turn on heater if temperature below target temperature
+  if (temperature < targetTemperature) {
+    nanoCoater->setGPIOState(HEATER_PW, 1);
+    heaterOn = true;
+  }
+
+  // Turn off heater if temperature 5 above target and was heating
+  if (temperature >= (targetTemperature + 5) && heaterOn) {
+    nanoCoater->setGPIOState(HEATER_PW, 0);
+    heaterOn = false;
+  }
+
+  // Default behavior if temperature is above target
+  if (temperature >= targetTemperature && !heaterOn) {
+    nanoCoater->setGPIOState(HEATER_PW, 0);
+    heaterOn = false;
   }
 }
 

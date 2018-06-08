@@ -111,7 +111,7 @@ void RootWidget::handleStop() {
 void RootWidget::handleTimer() {
   if (timeStep < seq->totalTime) {
     chart->step();
-    seq->applyState(coater, timeStep);
+    seq->applyState(coater, timeStep, temperature);
   } else {
     handleStop();
     return;
@@ -121,7 +121,7 @@ void RootWidget::handleTimer() {
 
 void RootWidget::handleTempRead() {
   if (tempSensor == nullptr && !tempSensor->isAvailable()) return;
-  double temperature = tempSensor->readTemperature();
+  temperature = tempSensor->readTemperature();
   tempReading->setText(QString::fromStdString(std::to_string(temperature)));
 }
 

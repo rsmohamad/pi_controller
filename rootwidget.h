@@ -53,6 +53,7 @@ class RootWidget : public QWidget {
   int timeStep = 0;
   NanoCoater *coater = nullptr;
   DS18B20 *tempSensor = nullptr;
+  double temperature = 0.0;
 };
 
 #endif  // MAINWINDOW_H

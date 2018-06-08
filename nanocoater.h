@@ -43,7 +43,7 @@ class NanoCoater {
   }
 
   void setDefaultState() {
-    for (unsigned int i = 0; i < NANO_PUMP_EN; i++) {
+    for (unsigned int i = 0; i < NUM_PINS; i++) {
       switch (i) {
         case HEATER_TEMP:
           break;
@@ -55,6 +55,9 @@ class NanoCoater {
           break;
         case NANO_PUMP:
           setStepperFrequency(0);
+          break;
+        case NANO_PUMP_EN:
+          setGPIOState(NANO_PUMP_EN, 1);
           break;
         default:
           setGPIOState(i, 0);

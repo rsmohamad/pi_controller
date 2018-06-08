@@ -1,14 +1,16 @@
 #include "ds18b20.h"
 #include <dirent.h>
 #include <string.h>
+#include <unistd.h>
+#include <iostream>
 
 const std::string prefixPath = "/sys/bus/w1/devices/";
 const std::string suffixPath = "/w1_slave";
 
 DS18B20::DS18B20() {
   // Load kernel modules
-  system("sudo modprobe w1-gpio");
-  system("sudo modprobe w1-therm");
+  system("modprobe w1-gpio");
+  system("modprobe w1-therm");
   sleep(1);
 
   // Get the temperature sensor id
@@ -23,6 +25,7 @@ DS18B20::DS18B20() {
 
   // Open file
   std::string path = prefixPath + devName + suffixPath;
+  std::cout << path << std::endl;
   tempInput.open(path.c_str());
 }
 
