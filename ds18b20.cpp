@@ -4,13 +4,15 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <QTimer>
+
 const std::string prefixPath = "/sys/bus/w1/devices/";
 const std::string suffixPath = "/w1_slave";
 
 DS18B20::DS18B20() {
   // Load kernel modules
-  system("modprobe w1-gpio");
-  system("modprobe w1-therm");
+  int r1 = system("modprobe w1-gpio");
+  int r2 = system("modprobe w1-therm");
   sleep(1);
 
   // Get the temperature sensor id
@@ -24,27 +26,49 @@ DS18B20::DS18B20() {
   }
 
   // Open file
-  std::string path = prefixPath + devName + suffixPath;
+  path = prefixPath + devName + suffixPath;
   std::cout << path << std::endl;
-  tempInput.open(path.c_str());
+  // tempInput.open(path.c_str());
 }
 
-double DS18B20::readTemperature() {
-  if (!tempInput.is_open()) return 0;
+DS18B20::~DS18B20() { tempInput.close(); }
 
-  double temperature;
+void DS18B20::readTemperature() {
+  tempInput.open(path.c_str());
+  if (!tempInput.is_open()) {
+    return;
+  }
+
+  double temperature = -1;
   std::string line;
   std::getline(tempInput, line);
 
   if (line.find("YES") != std::string::npos) {
     std::getline(tempInput, line);
     int pos = line.find("t=") + 2;
-    temperature = std::atof(line.substr(pos).c_str());
-    temperature /= 1000.0;
-    return temperature;
+    temperature = std::stod(line.substr(pos));
+    temperature /= (double)1000.0;
   }
 
-  return 0;
+  tempInput.close();
+  emit updateTemperature(temperature);
 }
 
-bool DS18B20::isAvailable() { return tempInput.is_open(); }
+bool DS18B20::isAvailable() {
+  tempInput.open(path.c_str());
+  bool isOpen = tempInput.is_open();
+  tempInput.close();
+  return isOpen;
+}
+
+void DS18B20::run() {
+  QTimer timer;
+  connect(&timer, SIGNAL(timeout()), this, SLOT(readTemperature()),
+          Qt::DirectConnection);
+
+  timer.setInterval(100);
+  timer.start();
+  exec();
+
+  timer.stop();
+}

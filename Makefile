@@ -56,7 +56,8 @@ SOURCES       = main.cpp \
 		sequence.cpp \
 		ds18b20.cpp /home/dandi/pi_controller/pi_controller_plugin_import.cpp \
 		moc_chart.cpp \
-		moc_rootwidget.cpp
+		moc_rootwidget.cpp \
+		moc_ds18b20.cpp
 OBJECTS       = main.o \
 		chart.o \
 		rootwidget.o \
@@ -64,7 +65,8 @@ OBJECTS       = main.o \
 		ds18b20.o \
 		pi_controller_plugin_import.o \
 		moc_chart.o \
-		moc_rootwidget.o
+		moc_rootwidget.o \
+		moc_ds18b20.o
 DIST          = ../raspi/qt5/mkspecs/features/spec_pre.prf \
 		../raspi/qt5/mkspecs/common/unix.conf \
 		../raspi/qt5/mkspecs/common/linux.conf \
@@ -495,9 +497,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: ../raspi/qt5/mkspecs/features/data/dummy.cpp
 	/home/dandi/raspi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-g++ -march=armv8-a -mtune=cortex-a53 -mfpu=crypto-neon-fp-armv8 -mfloat-abi=hard --sysroot=/home/dandi/raspi/sysroot -O2 -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h ../raspi/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_chart.cpp moc_rootwidget.cpp
+compiler_moc_header_make_all: moc_chart.cpp moc_rootwidget.cpp moc_ds18b20.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_chart.cpp moc_rootwidget.cpp
+	-$(DEL_FILE) moc_chart.cpp moc_rootwidget.cpp moc_ds18b20.cpp
 moc_chart.cpp: ../raspi/qt5pi/include/QtCharts/QChart \
 		../raspi/qt5pi/include/QtCharts/qchart.h \
 		../raspi/qt5pi/include/QtCharts/QAbstractSeries \
@@ -622,8 +624,8 @@ moc_chart.cpp: ../raspi/qt5pi/include/QtCharts/QChart \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
 		sequence.h \
-		pindefs.h \
 		nanocoater.h \
+		pindefs.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		chart.h \
 		moc_predefs.h \
@@ -782,14 +784,72 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtCharts/QChartView \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
 		chart.h \
 		sequence.h \
-		pindefs.h \
 		nanocoater.h \
+		pindefs.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		ds18b20.h \
+		../raspi/qt5pi/include/QtCore/QThread \
+		../raspi/qt5pi/include/QtCore/qthread.h \
 		rootwidget.h \
 		moc_predefs.h \
 		../raspi/qt5/bin/moc
 	/home/dandi/raspi/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/home/dandi/raspi/qt5/mkspecs/devices/linux-rasp-pi3-g++ -I/home/dandi/pi_controller -I/home/dandi/raspi/qt5pi/include -I/home/dandi/raspi/qt5pi/include/QtCharts -I/home/dandi/raspi/qt5pi/include/QtWidgets -I/home/dandi/raspi/qt5pi/include/QtGui -I/home/dandi/raspi/qt5pi/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include rootwidget.h -o moc_rootwidget.cpp
+
+moc_ds18b20.cpp: ../raspi/qt5pi/include/QtCore/QThread \
+		../raspi/qt5pi/include/QtCore/qthread.h \
+		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtCore/qnamespace.h \
+		../raspi/qt5pi/include/QtCore/qglobal.h \
+		../raspi/qt5pi/include/QtCore/qconfig-bootstrapped.h \
+		../raspi/qt5pi/include/QtCore/qconfig.h \
+		../raspi/qt5pi/include/QtCore/qtcore-config.h \
+		../raspi/qt5pi/include/QtCore/qsystemdetection.h \
+		../raspi/qt5pi/include/QtCore/qprocessordetection.h \
+		../raspi/qt5pi/include/QtCore/qcompilerdetection.h \
+		../raspi/qt5pi/include/QtCore/qtypeinfo.h \
+		../raspi/qt5pi/include/QtCore/qsysinfo.h \
+		../raspi/qt5pi/include/QtCore/qlogging.h \
+		../raspi/qt5pi/include/QtCore/qflags.h \
+		../raspi/qt5pi/include/QtCore/qatomic.h \
+		../raspi/qt5pi/include/QtCore/qbasicatomic.h \
+		../raspi/qt5pi/include/QtCore/qatomic_bootstrap.h \
+		../raspi/qt5pi/include/QtCore/qgenericatomic.h \
+		../raspi/qt5pi/include/QtCore/qatomic_cxx11.h \
+		../raspi/qt5pi/include/QtCore/qatomic_msvc.h \
+		../raspi/qt5pi/include/QtCore/qglobalstatic.h \
+		../raspi/qt5pi/include/QtCore/qmutex.h \
+		../raspi/qt5pi/include/QtCore/qnumeric.h \
+		../raspi/qt5pi/include/QtCore/qversiontagging.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
+		../raspi/qt5pi/include/QtCore/qstring.h \
+		../raspi/qt5pi/include/QtCore/qchar.h \
+		../raspi/qt5pi/include/QtCore/qbytearray.h \
+		../raspi/qt5pi/include/QtCore/qrefcount.h \
+		../raspi/qt5pi/include/QtCore/qarraydata.h \
+		../raspi/qt5pi/include/QtCore/qstringliteral.h \
+		../raspi/qt5pi/include/QtCore/qstringalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qstringview.h \
+		../raspi/qt5pi/include/QtCore/qstringbuilder.h \
+		../raspi/qt5pi/include/QtCore/qlist.h \
+		../raspi/qt5pi/include/QtCore/qalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qiterator.h \
+		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
+		../raspi/qt5pi/include/QtCore/qpair.h \
+		../raspi/qt5pi/include/QtCore/qbytearraylist.h \
+		../raspi/qt5pi/include/QtCore/qstringlist.h \
+		../raspi/qt5pi/include/QtCore/qregexp.h \
+		../raspi/qt5pi/include/QtCore/qstringmatcher.h \
+		../raspi/qt5pi/include/QtCore/qcoreevent.h \
+		../raspi/qt5pi/include/QtCore/qscopedpointer.h \
+		../raspi/qt5pi/include/QtCore/qmetatype.h \
+		../raspi/qt5pi/include/QtCore/qvarlengtharray.h \
+		../raspi/qt5pi/include/QtCore/qcontainerfwd.h \
+		../raspi/qt5pi/include/QtCore/qobject_impl.h \
+		ds18b20.h \
+		moc_predefs.h \
+		../raspi/qt5/bin/moc
+	/home/dandi/raspi/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/home/dandi/raspi/qt5/mkspecs/devices/linux-rasp-pi3-g++ -I/home/dandi/pi_controller -I/home/dandi/raspi/qt5pi/include -I/home/dandi/raspi/qt5pi/include/QtCharts -I/home/dandi/raspi/qt5pi/include/QtWidgets -I/home/dandi/raspi/qt5pi/include/QtGui -I/home/dandi/raspi/qt5pi/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ds18b20.h -o moc_ds18b20.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -976,7 +1036,9 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QMessageBox \
 		chart.h \
 		sequence.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
-		ds18b20.h
+		ds18b20.h \
+		../raspi/qt5pi/include/QtCore/QThread \
+		../raspi/qt5pi/include/QtCore/qthread.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 chart.o: chart.cpp chart.h \
@@ -1104,8 +1166,8 @@ chart.o: chart.cpp chart.h \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
 		sequence.h \
-		pindefs.h \
 		nanocoater.h \
+		pindefs.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		../raspi/qt5pi/include/QtCore/QEasingCurve \
 		../raspi/qt5pi/include/QtCore/qeasingcurve.h \
@@ -1275,10 +1337,12 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h \
 		chart.h \
 		sequence.h \
-		pindefs.h \
 		nanocoater.h \
+		pindefs.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		ds18b20.h \
+		../raspi/qt5pi/include/QtCore/QThread \
+		../raspi/qt5pi/include/QtCore/qthread.h \
 		../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtWidgets/qapplication.h \
 		../raspi/qt5pi/include/QtCore/qcoreapplication.h \
@@ -1296,8 +1360,8 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rootwidget.o rootwidget.cpp
 
 sequence.o: sequence.cpp sequence.h \
-		pindefs.h \
 		nanocoater.h \
+		pindefs.h \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		../raspi/qt5pi/include/QtCore/qpoint.h \
 		../raspi/qt5pi/include/QtCore/qnamespace.h \
@@ -1324,7 +1388,61 @@ sequence.o: sequence.cpp sequence.h \
 		../raspi/qt5pi/include/QtCore/qversiontagging.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sequence.o sequence.cpp
 
-ds18b20.o: ds18b20.cpp ds18b20.h
+ds18b20.o: ds18b20.cpp ds18b20.h \
+		../raspi/qt5pi/include/QtCore/QThread \
+		../raspi/qt5pi/include/QtCore/qthread.h \
+		../raspi/qt5pi/include/QtCore/qobject.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs.h \
+		../raspi/qt5pi/include/QtCore/qnamespace.h \
+		../raspi/qt5pi/include/QtCore/qglobal.h \
+		../raspi/qt5pi/include/QtCore/qconfig-bootstrapped.h \
+		../raspi/qt5pi/include/QtCore/qconfig.h \
+		../raspi/qt5pi/include/QtCore/qtcore-config.h \
+		../raspi/qt5pi/include/QtCore/qsystemdetection.h \
+		../raspi/qt5pi/include/QtCore/qprocessordetection.h \
+		../raspi/qt5pi/include/QtCore/qcompilerdetection.h \
+		../raspi/qt5pi/include/QtCore/qtypeinfo.h \
+		../raspi/qt5pi/include/QtCore/qsysinfo.h \
+		../raspi/qt5pi/include/QtCore/qlogging.h \
+		../raspi/qt5pi/include/QtCore/qflags.h \
+		../raspi/qt5pi/include/QtCore/qatomic.h \
+		../raspi/qt5pi/include/QtCore/qbasicatomic.h \
+		../raspi/qt5pi/include/QtCore/qatomic_bootstrap.h \
+		../raspi/qt5pi/include/QtCore/qgenericatomic.h \
+		../raspi/qt5pi/include/QtCore/qatomic_cxx11.h \
+		../raspi/qt5pi/include/QtCore/qatomic_msvc.h \
+		../raspi/qt5pi/include/QtCore/qglobalstatic.h \
+		../raspi/qt5pi/include/QtCore/qmutex.h \
+		../raspi/qt5pi/include/QtCore/qnumeric.h \
+		../raspi/qt5pi/include/QtCore/qversiontagging.h \
+		../raspi/qt5pi/include/QtCore/qobjectdefs_impl.h \
+		../raspi/qt5pi/include/QtCore/qstring.h \
+		../raspi/qt5pi/include/QtCore/qchar.h \
+		../raspi/qt5pi/include/QtCore/qbytearray.h \
+		../raspi/qt5pi/include/QtCore/qrefcount.h \
+		../raspi/qt5pi/include/QtCore/qarraydata.h \
+		../raspi/qt5pi/include/QtCore/qstringliteral.h \
+		../raspi/qt5pi/include/QtCore/qstringalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qstringview.h \
+		../raspi/qt5pi/include/QtCore/qstringbuilder.h \
+		../raspi/qt5pi/include/QtCore/qlist.h \
+		../raspi/qt5pi/include/QtCore/qalgorithms.h \
+		../raspi/qt5pi/include/QtCore/qiterator.h \
+		../raspi/qt5pi/include/QtCore/qhashfunctions.h \
+		../raspi/qt5pi/include/QtCore/qpair.h \
+		../raspi/qt5pi/include/QtCore/qbytearraylist.h \
+		../raspi/qt5pi/include/QtCore/qstringlist.h \
+		../raspi/qt5pi/include/QtCore/qregexp.h \
+		../raspi/qt5pi/include/QtCore/qstringmatcher.h \
+		../raspi/qt5pi/include/QtCore/qcoreevent.h \
+		../raspi/qt5pi/include/QtCore/qscopedpointer.h \
+		../raspi/qt5pi/include/QtCore/qmetatype.h \
+		../raspi/qt5pi/include/QtCore/qvarlengtharray.h \
+		../raspi/qt5pi/include/QtCore/qcontainerfwd.h \
+		../raspi/qt5pi/include/QtCore/qobject_impl.h \
+		../raspi/qt5pi/include/QtCore/QTimer \
+		../raspi/qt5pi/include/QtCore/qtimer.h \
+		../raspi/qt5pi/include/QtCore/qbasictimer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ds18b20.o ds18b20.cpp
 
 pi_controller_plugin_import.o: /home/dandi/pi_controller/pi_controller_plugin_import.cpp 
@@ -1335,6 +1453,9 @@ moc_chart.o: moc_chart.cpp
 
 moc_rootwidget.o: moc_rootwidget.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_rootwidget.o moc_rootwidget.cpp
+
+moc_ds18b20.o: moc_ds18b20.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ds18b20.o moc_ds18b20.cpp
 
 ####### Install
 

@@ -20,7 +20,6 @@ class RootWidget : public QWidget {
  public:
   explicit RootWidget(QWidget *parent = nullptr);
   void setNanoCoater(NanoCoater *);
-  void setTempSensor(DS18B20 *);
 
  signals:
 
@@ -30,7 +29,7 @@ class RootWidget : public QWidget {
   void handleStart();
   void handleStop();
   void handleTimer();
-  void handleTempRead();
+  void onTemperatureUpdate(double);
 
  private:
   QWidget *buttonPane;
@@ -52,8 +51,7 @@ class RootWidget : public QWidget {
 
   int timeStep = 0;
   NanoCoater *coater = nullptr;
-  DS18B20 *tempSensor = nullptr;
-  double temperature = 0.0;
+  double temperature = 0;
 };
 
 #endif  // MAINWINDOW_H

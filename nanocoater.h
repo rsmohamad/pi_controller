@@ -12,10 +12,7 @@ class NanoCoater {
     for (int i = 0; i < NUM_PINS; i++)
       if (i != HEATER_TEMP) gpioSetMode(gpioNum[i], PI_OUTPUT);
 
-    gpioSetMode(gpioNum[HEATER_PUMP], PI_ALT0);
-    gpioSetMode(gpioNum[ATOM_PUMP], PI_ALT0);
     gpioSetMode(gpioNum[NANO_PUMP], PI_ALT5);
-
     gpioSetPWMfrequency(gpioNum[HEATER_PUMP], 200);
     gpioSetPWMfrequency(gpioNum[ATOM_PUMP], 200);
 
@@ -23,7 +20,7 @@ class NanoCoater {
   }
 
   void setGPIOState(unsigned int pin, int state) {
-    if (state != 1 || state != 0) state = 0;
+    if (state != 1 && state != 0) state = 0;
     gpioWrite(gpioNum[pin], state);
     // std::cout << gpioNum[pin] << std::endl;
   }
@@ -36,10 +33,10 @@ class NanoCoater {
     if (freq <= 0) {
       setGPIOState(NANO_PUMP_EN, 1);
       gpioHardwarePWM(gpioNum[NANO_PUMP], 0, 0);
-      return;
+    } else {
+      setGPIOState(NANO_PUMP_EN, 0);
+      gpioHardwarePWM(gpioNum[NANO_PUMP], 100, freq);
     }
-    setGPIOState(NANO_PUMP_EN, 0);
-    gpioHardwarePWM(gpioNum[NANO_PUMP], 100, freq);
   }
 
   void setDefaultState() {

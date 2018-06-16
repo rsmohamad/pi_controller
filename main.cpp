@@ -15,6 +15,17 @@ int main(int argc, char *argv[]) {
   // window.setWindowFlags(Qt::FramelessWindowHint);
 
   RootWidget root;
+  DS18B20 tempSensor;
+  if (tempSensor.isAvailable()) {
+    QObject::connect(&tempSensor, SIGNAL(updateTemperature(double)), &root,
+                     SLOT(onTemperatureUpdate(double)), Qt::QueuedConnection);
+    tempSensor.start();
+  } else {
+    QMessageBox msgBox;
+    msgBox.setText("Temperature sensor is not available");
+    msgBox.exec();
+  }
+
   if (gpioInitialise() >= 0)
     root.setNanoCoater(new NanoCoater());
   else {
@@ -23,19 +34,13 @@ int main(int argc, char *argv[]) {
     msgBox.exec();
   }
 
-  DS18B20 *tempSensor = new DS18B20();
-  if (tempSensor->isAvailable())
-    root.setTempSensor(tempSensor);
-  else {
-    QMessageBox msgBox;
-    msgBox.setText("Temperature sensor is not available");
-    msgBox.exec();
-  }
-
   window.setCentralWidget(&root);
-  window.resize(1024, 640);
+  window.resize(1024, 600);
   window.setWindowTitle("Pi Controller");
   window.show();
 
   return a.exec();
+
+  tempSensor.quit();
+  tempSensor.wait();
 }

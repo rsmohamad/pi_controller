@@ -56,10 +56,13 @@ void Sequence::applyState(NanoCoater *nanoCoater, int timeStep) {
         break;
       case NANO_PUMP:
         nanoCoater->setStepperFrequency(state[NANO_PUMP][timeStep]);
+        break;
       default:
         nanoCoater->setGPIOState(i, state[i][timeStep]);
         break;
     }
+
+    std::cout << state[i][timeStep] << std::endl;
   }
 }
 

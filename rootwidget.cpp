@@ -38,7 +38,8 @@ RootWidget::RootWidget(QWidget *parent)
   QObject::connect(load, SIGNAL(pressed()), this, SLOT(handleCSV()));
   QObject::connect(stop, SIGNAL(pressed()), this, SLOT(handleStop()));
   QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(handleTimer()));
-  QObject::connect(&tempTimer, SIGNAL(timeout()), this, SLOT(handleTempRead()));
+  QObject::connect(&tempTimer, SIGNAL(timeout()), this,
+                   SLOT(onTemperatureUpdate()));
   m_timer.setInterval(1000);
 
   vbox = new QVBoxLayout();
@@ -65,6 +66,7 @@ RootWidget::RootWidget(QWidget *parent)
 void RootWidget::handleExit() {
   std::cout << "Exit" << std::endl;
   if (coater != nullptr) coater->setDefaultState();
+  gpioTerminate();
 
   QApplication::quit();
 }
@@ -119,19 +121,11 @@ void RootWidget::handleTimer() {
   timeStep++;
 }
 
-void RootWidget::handleTempRead() {
-  if (tempSensor == nullptr && !tempSensor->isAvailable()) return;
-  temperature = tempSensor->readTemperature();
+void RootWidget::onTemperatureUpdate(double temperature) {
+  this->temperature = temperature;
   tempReading->setText(QString::fromStdString(std::to_string(temperature)));
 }
 
 void RootWidget::setNanoCoater(NanoCoater *nanoCoater) {
   this->coater = nanoCoater;
-}
-
-void RootWidget::setTempSensor(DS18B20 *sensor) {
-  if (sensor == nullptr && !sensor->isAvailable()) return;
-  tempSensor = sensor;
-  tempTimer.setInterval(100);
-  tempTimer.start();
 }
