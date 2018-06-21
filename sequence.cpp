@@ -62,13 +62,16 @@ void Sequence::applyState(NanoCoater *nanoCoater, int timeStep) {
         break;
     }
 
-    std::cout << state[i][timeStep] << std::endl;
+    // std::cout << state[i][timeStep] << std::endl;
   }
 }
 
 // Apply temperature control according to what client wants
 void Sequence::applyState(NanoCoater *nanoCoater, int timeStep,
                           double temperature) {
+  std::cout << state[ATOM_PUMP][timeStep] << " ";
+  std::cout << state[HEATER_PUMP][timeStep] << " ";
+  std::cout << state[NANO_PUMP][timeStep] << std::endl;
   if (nanoCoater == nullptr) return;
   applyState(nanoCoater, timeStep);
 

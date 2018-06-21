@@ -38,8 +38,6 @@ RootWidget::RootWidget(QWidget *parent)
   QObject::connect(load, SIGNAL(pressed()), this, SLOT(handleCSV()));
   QObject::connect(stop, SIGNAL(pressed()), this, SLOT(handleStop()));
   QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(handleTimer()));
-  QObject::connect(&tempTimer, SIGNAL(timeout()), this,
-                   SLOT(onTemperatureUpdate()));
   m_timer.setInterval(1000);
 
   vbox = new QVBoxLayout();

@@ -43,15 +43,14 @@ class RootWidget : public QWidget {
   QPushButton *load;
   QPushButton *stop;
   QLabel *tempReading;
+  QTimer m_timer;
 
   Chart *chart = nullptr;
   Sequence *seq = nullptr;
-  QTimer m_timer;
-  QTimer tempTimer;
-
-  int timeStep = 0;
   NanoCoater *coater = nullptr;
+
   double temperature = 0;
+  int timeStep = 0;
 };
 
 #endif  // MAINWINDOW_H
