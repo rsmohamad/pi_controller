@@ -7,6 +7,17 @@
 #include "nanocoater.h"
 #include "rootwidget.h"
 
+std::vector<std::string> split(std::string line, char delim) {
+  std::string buf;
+  std::istringstream ss(line);
+  std::vector<std::string> tokens;
+
+  while (std::getline(ss, buf, delim)) tokens.push_back(buf);
+  if (buf == "\0") tokens.push_back(buf);
+
+  return tokens;
+}
+
 int main(int argc, char *argv[]) {
   QApplication::setSetuidAllowed(true);
   QApplication a(argc, argv);

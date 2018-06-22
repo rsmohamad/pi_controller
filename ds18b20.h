@@ -22,8 +22,6 @@ class DS18B20 : public QThread {
   std::string devName;
   std::string path;
   void run();
-
-  double haha = 0;
 };
 
 #endif  // DS18B20_H

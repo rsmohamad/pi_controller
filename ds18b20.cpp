@@ -11,8 +11,8 @@ const std::string suffixPath = "/w1_slave";
 
 DS18B20::DS18B20() {
   // Load kernel modules
-  int r1 = system("modprobe w1-gpio");
-  int r2 = system("modprobe w1-therm");
+  system("modprobe w1-gpio");
+  system("modprobe w1-therm");
   sleep(1);
 
   // Get the temperature sensor id

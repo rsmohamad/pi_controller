@@ -20,6 +20,8 @@ class RootWidget : public QWidget {
  public:
   explicit RootWidget(QWidget *parent = nullptr);
   void setNanoCoater(NanoCoater *);
+  void paintEvent(QPaintEvent *event);
+  void setStatusButtons(int);
 
  signals:
 
@@ -29,21 +31,26 @@ class RootWidget : public QWidget {
   void handleStart();
   void handleStop();
   void handleTimer();
+  void handleManual();
+  void handleStatusButton(int);
   void onTemperatureUpdate(double);
 
  private:
-  QWidget *buttonPane;
+  QWidget *rightPane, *leftPane;
   QChartView *chartView;
 
   QHBoxLayout *hbox;
-  QVBoxLayout *vbox;
+  QVBoxLayout *rightVBox, *leftVBox;
 
   QPushButton *start;
   QPushButton *exit;
   QPushButton *load;
   QPushButton *stop;
+  QPushButton *manual;
   QLabel *tempReading;
   QTimer m_timer;
+
+  std::vector<QPushButton *> statusButtons;
 
   Chart *chart = nullptr;
   Sequence *seq = nullptr;
@@ -51,6 +58,7 @@ class RootWidget : public QWidget {
 
   double temperature = 0;
   int timeStep = 0;
+  bool isManual = false;
 };
 
 #endif  // MAINWINDOW_H

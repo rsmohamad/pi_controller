@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 
+std::vector<std::string> split(std::string line, char delim);
+
 Sequence::Sequence(const std::string &filename) {
   readCSV(filename);
   std::cout << totalTime << std::endl;

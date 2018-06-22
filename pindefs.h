@@ -12,8 +12,6 @@ enum {
   HEATER_TEMP,
   ATOM_PW,
   ATOM_PUMP,
-  ATOM_VALVE_OPEN,
-  ATOM_VALVE_CLOSE,
   NANO_PUMP,
   FILTER_VALVE_OPEN,
   FILTER_VALVE_CLOSE,
@@ -25,24 +23,12 @@ enum {
   NUM_PINS
 };
 
-static const unsigned int gpioNum[NUM_PINS] = {12, 16, 20, 4,  19, 13, 5,
-                                               6,  18, 17, 27, 22, 23, 21};
+static const unsigned int gpioNum[NUM_PINS] = {12, 16, 20, 4,  19, 13,
+                                               18, 17, 27, 22, 23, 21};
 
 static const std::string STATE_NAMES[MASTER_SW] = {
-    "HEATER_PUMP",       "HEATER_VALVE_OPEN", "HEATER_VALVE_CLOSE",
-    "HEATER_TEMP",       "ATOM_PW",           "ATOM_PUMP",
-    "ATOM_VALVE_OPEN",   "ATOM_VALVE_CLOSE",  "NANO_PUMP",
-    "FILTER_VALVE_OPEN", "FILTER_VALVE_CLOSE"};
-
-static std::vector<std::string> split(std::string line, char delim) {
-  std::string buf;
-  std::istringstream ss(line);
-  std::vector<std::string> tokens;
-
-  while (std::getline(ss, buf, delim)) tokens.push_back(buf);
-  if (buf == "\0") tokens.push_back(buf);
-
-  return tokens;
-}
+    "HEATER_PUMP", "HEATER_VALVE_OPEN", "HEATER_VALVE_CLOSE",
+    "HEATER_TEMP", "ATOM_PW",           "ATOM_PUMP",
+    "NANO_PUMP",   "FILTER_VALVE_OPEN", "FILTER_VALVE_CLOSE"};
 
 #endif  // PINDEFS_H

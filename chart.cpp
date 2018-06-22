@@ -14,6 +14,8 @@
 
 #include "pindefs.h"
 
+std::vector<std::string> split(std::string line, char delim);
+
 std::string snakeCaseToNormal(std::string input) {
   std::vector<std::string> tokens = split(input, '_');
   std::string output;
@@ -34,12 +36,12 @@ Chart::Chart(QGraphicsItem *parent, Qt::WindowFlags wFlags)
   xAxis->setRange(0, 9);
   setAxisX(xAxis);
 
-  for (int i = 10; i >= 0; i--) {
+  for (int i = MASTER_SW - 1; i >= 0; i--) {
     std::string label = snakeCaseToNormal(STATE_NAMES[i]);
-    yAxis->append(QString::fromStdString(label), 11 - i);
+    yAxis->append(QString::fromStdString(label), MASTER_SW - i);
   }
 
-  yAxis->setRange(0, 11);
+  yAxis->setRange(0, MASTER_SW);
   yAxis->setGridLineVisible(false);
   yAxis->setShadesPen(Qt::NoPen);
   yAxis->setShadesBrush(QBrush(QColor(0x99, 0xcc, 0xcc, 30)));
@@ -72,7 +74,7 @@ void Chart::drawSequence(Sequence *seq) {
     std::vector<int> points = seq->state[i];
 
     for (qreal j = 0; j < points.size(); j++) {
-      qreal y = (10 - i + 0.2);
+      qreal y = (MASTER_SW - 1 - i + 0.2);
 
       // Normalize non binary values
       if (i == ATOM_PUMP || i == HEATER_PUMP || i == HEATER_TEMP)
