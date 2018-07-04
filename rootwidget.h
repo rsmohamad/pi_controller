@@ -12,6 +12,7 @@
 
 #include "chart.h"
 #include "ds18b20.h"
+#include "manual.h"
 #include "nanocoater.h"
 #include "sequence.h"
 
@@ -46,7 +47,7 @@ class RootWidget : public QWidget {
   QPushButton *exit;
   QPushButton *load;
   QPushButton *stop;
-  QPushButton *manual;
+  QPushButton *manualBtn;
   QLabel *tempReading;
   QTimer m_timer;
 
@@ -55,6 +56,7 @@ class RootWidget : public QWidget {
   Chart *chart = nullptr;
   Sequence *seq = nullptr;
   NanoCoater *coater = nullptr;
+  Manual manual;
 
   double temperature = 0;
   int timeStep = 0;

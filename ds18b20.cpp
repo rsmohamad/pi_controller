@@ -13,7 +13,6 @@ DS18B20::DS18B20() {
   // Load kernel modules
   system("modprobe w1-gpio");
   system("modprobe w1-therm");
-  sleep(1);
 
   // Get the temperature sensor id
   DIR *d = opendir(prefixPath.c_str());

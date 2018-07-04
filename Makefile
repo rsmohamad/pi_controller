@@ -54,7 +54,8 @@ SOURCES       = main.cpp \
 		chart.cpp \
 		rootwidget.cpp \
 		sequence.cpp \
-		ds18b20.cpp /home/dandi/pi_controller/pi_controller_plugin_import.cpp \
+		ds18b20.cpp \
+		manual.cpp /home/dandi/pi_controller/pi_controller_plugin_import.cpp \
 		moc_chart.cpp \
 		moc_rootwidget.cpp \
 		moc_ds18b20.cpp
@@ -63,6 +64,7 @@ OBJECTS       = main.o \
 		rootwidget.o \
 		sequence.o \
 		ds18b20.o \
+		manual.o \
 		pi_controller_plugin_import.o \
 		moc_chart.o \
 		moc_rootwidget.o \
@@ -184,11 +186,13 @@ DIST          = ../raspi/qt5/mkspecs/features/spec_pre.prf \
 		sequence.h \
 		pindefs.h \
 		nanocoater.h \
-		ds18b20.h main.cpp \
+		ds18b20.h \
+		manual.h main.cpp \
 		chart.cpp \
 		rootwidget.cpp \
 		sequence.cpp \
-		ds18b20.cpp
+		ds18b20.cpp \
+		manual.cpp
 QMAKE_TARGET  = pi_controller
 DESTDIR       = 
 TARGET        = pi_controller
@@ -464,8 +468,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../raspi/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents chart.h rootwidget.h sequence.h pindefs.h nanocoater.h ds18b20.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp chart.cpp rootwidget.cpp sequence.cpp ds18b20.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents chart.h rootwidget.h sequence.h pindefs.h nanocoater.h ds18b20.h manual.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp chart.cpp rootwidget.cpp sequence.cpp ds18b20.cpp manual.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -790,6 +794,7 @@ moc_rootwidget.cpp: ../raspi/qt5pi/include/QtCharts/QChartView \
 		ds18b20.h \
 		../raspi/qt5pi/include/QtCore/QThread \
 		../raspi/qt5pi/include/QtCore/qthread.h \
+		manual.h \
 		rootwidget.h \
 		moc_predefs.h \
 		../raspi/qt5/bin/moc
@@ -1038,7 +1043,8 @@ main.o: main.cpp ../raspi/qt5pi/include/QtWidgets/QMessageBox \
 		../raspi/qt5pi/include/QtCore/QPoint \
 		ds18b20.h \
 		../raspi/qt5pi/include/QtCore/QThread \
-		../raspi/qt5pi/include/QtCore/qthread.h
+		../raspi/qt5pi/include/QtCore/qthread.h \
+		manual.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 chart.o: chart.cpp chart.h \
@@ -1343,6 +1349,7 @@ rootwidget.o: rootwidget.cpp rootwidget.h \
 		ds18b20.h \
 		../raspi/qt5pi/include/QtCore/QThread \
 		../raspi/qt5pi/include/QtCore/qthread.h \
+		manual.h \
 		../raspi/qt5pi/include/QtWidgets/QApplication \
 		../raspi/qt5pi/include/QtWidgets/qapplication.h \
 		../raspi/qt5pi/include/QtCore/qcoreapplication.h \
@@ -1444,6 +1451,11 @@ ds18b20.o: ds18b20.cpp ds18b20.h \
 		../raspi/qt5pi/include/QtCore/qtimer.h \
 		../raspi/qt5pi/include/QtCore/qbasictimer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ds18b20.o ds18b20.cpp
+
+manual.o: manual.cpp manual.h \
+		nanocoater.h \
+		pindefs.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o manual.o manual.cpp
 
 pi_controller_plugin_import.o: /home/dandi/pi_controller/pi_controller_plugin_import.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pi_controller_plugin_import.o /home/dandi/pi_controller/pi_controller_plugin_import.cpp

@@ -7,27 +7,6 @@
 #include <QtCharts/QChartView>
 #include <iostream>
 
-bool heaterOn = false;
-void tempControl(NanoCoater *nanoCoater, int temperature, int target) {
-  // Turn on heater if temperature below target temperature
-  if (temperature < target) {
-    nanoCoater->setGPIOState(HEATER_PW, 1);
-    heaterOn = true;
-  }
-
-  // Turn off heater if temperature 5 above target and was heating
-  if (temperature >= (target + 5) && heaterOn) {
-    nanoCoater->setGPIOState(HEATER_PW, 0);
-    heaterOn = false;
-  }
-
-  // Default behavior if temperature is above target
-  if (temperature >= target && !heaterOn) {
-    nanoCoater->setGPIOState(HEATER_PW, 0);
-    heaterOn = false;
-  }
-}
-
 RootWidget::RootWidget(QWidget *parent)
     : QWidget(parent)
 
@@ -41,17 +20,17 @@ RootWidget::RootWidget(QWidget *parent)
   start = new QPushButton("Start");
   stop = new QPushButton("Stop");
   exit = new QPushButton("Exit");
-  manual = new QPushButton("Manual");
+  manualBtn = new QPushButton("Manual");
   tempReading = new QLabel("0.000");
   tempReading->setAlignment(Qt::AlignCenter);
   QFont f("Arial", 16, QFont::Bold);
   tempReading->setFont(f);
 
-  load->setMinimumSize(100, 80);
-  start->setMinimumSize(100, 80);
-  stop->setMinimumSize(100, 80);
-  exit->setMinimumSize(100, 80);
-  manual->setMinimumSize(100, 80);
+  load->setMinimumSize(100, 70);
+  start->setMinimumSize(100, 70);
+  stop->setMinimumSize(100, 70);
+  exit->setMinimumSize(100, 70);
+  manualBtn->setMinimumSize(100, 70);
 
   start->setDisabled(true);
   stop->setDisabled(true);
@@ -60,7 +39,7 @@ RootWidget::RootWidget(QWidget *parent)
   QObject::connect(exit, SIGNAL(pressed()), this, SLOT(handleExit()));
   QObject::connect(load, SIGNAL(pressed()), this, SLOT(handleCSV()));
   QObject::connect(stop, SIGNAL(pressed()), this, SLOT(handleStop()));
-  QObject::connect(manual, SIGNAL(pressed()), this, SLOT(handleManual()));
+  QObject::connect(manualBtn, SIGNAL(pressed()), this, SLOT(handleManual()));
   QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(handleTimer()));
   m_timer.setInterval(1000);
 
@@ -72,7 +51,7 @@ RootWidget::RootWidget(QWidget *parent)
   rightVBox->addWidget(load);
   rightVBox->addWidget(start);
   rightVBox->addWidget(stop);
-  rightVBox->addWidget(manual);
+  rightVBox->addWidget(manualBtn);
   rightVBox->addWidget(exit);
   rightVBox->addWidget(tempLabel);
   rightVBox->addWidget(tempReading);
@@ -115,7 +94,6 @@ void RootWidget::paintEvent(QPaintEvent *event) {
 void RootWidget::setStatusButtons(int timeStep) {
   for (int i = 0; i < MASTER_SW; i++) {
     int status;
-
     if (timeStep < 0)
       status = 0;
     else
@@ -147,7 +125,7 @@ void RootWidget::handleStart() {
   load->setDisabled(true);
   start->setDisabled(true);
   stop->setDisabled(false);
-  manual->setDisabled(true);
+  manualBtn->setDisabled(true);
 }
 
 void RootWidget::handleCSV() {
@@ -176,7 +154,7 @@ void RootWidget::handleStop() {
   load->setDisabled(false);
   start->setDisabled(false);
   stop->setDisabled(true);
-  manual->setDisabled(false);
+  manualBtn->setDisabled(false);
   timeStep = 0;
   setStatusButtons(-1);
 }
@@ -193,7 +171,7 @@ void RootWidget::handleTimer() {
     }
     timeStep++;
   } else {
-    tempControl(coater, temperature, 50);
+    manual.tempControl(temperature);
   }
 }
 
@@ -204,38 +182,32 @@ void RootWidget::onTemperatureUpdate(double temperature) {
 
 void RootWidget::setNanoCoater(NanoCoater *nanoCoater) {
   this->coater = nanoCoater;
+  manual.setCoater(nanoCoater);
 }
 
 void RootWidget::handleManual() {
   isManual = !isManual;
   setStatusButtons(-1);
   coater->setDefaultState();
+  manual.clearState();
 
   if (!isManual) {
-    manual->setText("Manual");
-    load->setEnabled(true);
+    manualBtn->setText("Manual");
     if (seq != nullptr) start->setEnabled(true);
+    load->setEnabled(true);
+
+    coater->setGPIOState(MASTER_SW, 0);
     m_timer.stop();
   } else {
-    manual->setText("Quit Manual");
+    manualBtn->setText("Quit Manual");
     load->setEnabled(false);
     start->setEnabled(false);
     stop->setEnabled(false);
-    coater->setAtomPumpSpeed(50);
-    coater->setHeaterPumpSpeed(50);
-    coater->setStepperFrequency(1000);
-    coater->setGPIOState(MASTER_SW, 1);
 
-    statusButtons[ATOM_PUMP]->setText("50");
-    statusButtons[HEATER_PUMP]->setText("50");
-    statusButtons[HEATER_TEMP]->setText("50");
-    statusButtons[NANO_PUMP]->setText("1000");
+    coater->setGPIOState(MASTER_SW, 1);
     m_timer.start();
 
     for (int i = 0; i < MASTER_SW; i++) {
-      if (i == ATOM_PUMP || i == HEATER_PUMP || i == HEATER_TEMP ||
-          i == NANO_PUMP)
-        continue;
       statusButtons[i]->setEnabled(true);
       statusButtons[i]->setStyleSheet(
           "QPushButton{ background-color: tomato }");
@@ -244,20 +216,12 @@ void RootWidget::handleManual() {
 }
 
 void RootWidget::handleStatusButton(int num) {
-  if (num == ATOM_PUMP || num == HEATER_PUMP || num == HEATER_TEMP ||
-      num == NANO_PUMP || !isManual)
-    return;
-
-  bool isOn = statusButtons[num]->text() == "ON";
-  if (isOn) {
-    coater->setGPIOState(num, 0);
-    statusButtons[num]->setText("OFF");
-    statusButtons[num]->setStyleSheet(
-        "QPushButton{ background-color: tomato }");
-  } else {
-    coater->setGPIOState(num, 1);
-    statusButtons[num]->setText("ON");
+  if (!isManual) return;
+  if (manual.toggleState(num))
     statusButtons[num]->setStyleSheet(
         "QPushButton{ background-color: lightgreen }");
-  }
+  else
+    statusButtons[num]->setStyleSheet(
+        "QPushButton{ background-color: tomato }");
+  statusButtons[num]->setText(QString::fromStdString(manual.getLabel(num)));
 }
